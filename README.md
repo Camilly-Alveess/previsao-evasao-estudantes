@@ -2,6 +2,7 @@
 
 Pipeline de Machine Learning para prever a **evasão de estudantes** de uma faculdade a partir de dados de desempenho acadêmico, com deploy em Streamlit.
 
+Link da Aplicação: [Streamlit para Previsão](https://previsao-evasao-estudantes-gk2kzxfkxz233ophzapwx7.streamlit.app)
 ---
 
 ## 1. Objetivo
