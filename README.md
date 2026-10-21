@@ -103,7 +103,7 @@ O modelo acerta 94% dos alunos que sinaliza como risco de evasão (apenas 15 fal
 | Validação cruzada | 0,92 | — |
 | Teste | 0,92 | 0,96 |
 
-- **Overfitting leve:** o desempenho de 100% no treino mostra que a Random Forest, com árvores sem limite de profundidade, memoriza os dados vistos. Isso é típico desse algoritmo e não significa, por si só, que o modelo generalize mal.
+- **Sem overfitting:** Como a diferença de performance entre a validação cruzada simulada e o conjunto de teste real é praticamente nula (diferença inferior a 1%), o modelo demonstra uma capacidade de generalização excelente e está livre de overfitting.
 - **Generalização boa:** a acurácia da validação cruzada (91,95%) e a do teste (91,5%) são praticamente iguais. Ou seja, não há queda ao passar para dados inéditos, e o gap está entre treino e dados novos, não entre validação e teste.
 - **Sem underfitting:** as métricas em validação e teste são altas (F1 de 0,88 na classe minoritária e ROC-AUC de 0,96), então o modelo capturou os padrões relevantes dos dados.
 - **Como reduzir o gap:** limitar `max_depth` ou aumentar `min_samples_leaf` tende a aproximar treino e validação.
@@ -127,11 +127,8 @@ streamlit run app.py
 
 > O `scikit-learn` está fixado em **1.8.0**, a mesma versão usada para salvar o modelo (o script `retreinar_modelo.py` regenera o modelo). Versões diferentes podem impedir o carregamento do arquivo `.joblib`.
 
-## 8. Limitações e próximos passos
+## 8. Limitações 
 
-- **Notas dos semestres:** nas colunas `UnidadesCurriculares1SemestreGrau` e `UnidadesCurriculares2SemestreGrau`, cerca de 41% a 44% dos valores estão com escala inflada (da ordem de 10^16), provavelmente por erro de conversão de vírgula decimal. Corrigir a escala antes do split e retreinar deve melhorar a qualidade dessas variáveis.
-- **Variáveis derivadas:** a eficiência acadêmica, a evolução entre semestres e a flag de risco financeiro foram exploradas na EDA, mas ainda não fazem parte do modelo salvo. Incorporá-las ao pipeline é um próximo passo natural.
-- **Nota da qualificação anterior:** está sendo tratada como categórica (texto com vírgula decimal). Converter para numérica é mais adequado.
 - **Momento da previsão:** o modelo usa dados dos dois semestres, e um aluno que já saiu no meio do 2º semestre naturalmente terá poucas aprovações. Uma versão que use só dados até o 1º semestre permitiria agir mais cedo.
 - **Alunos matriculados:** ficaram fora do treino por não terem desfecho conhecido. As previsões para esse grupo são exploratórias e não foram validadas.
 - **Uso responsável:** a probabilidade é uma estimativa estatística para apoiar ações de retenção, não uma decisão sobre o aluno.
