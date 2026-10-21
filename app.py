@@ -1,9 +1,10 @@
 """App Streamlit: previsão de evasão de estudantes.
 
-Arquivos necessários na mesma pasta (ou em models/ e data/):
+Arquivos necessários (em qualquer pasta do projeto):
     modelo_evasao_pipeline.joblib, dados_treino.csv, dados_teste.csv, outlier_clipper.py
 Rodar localmente:  streamlit run app.py
 """
+import os
 from pathlib import Path
 
 import __main__
@@ -42,26 +43,45 @@ ROTULOS = {
 NENHUM = "— preencher manualmente —"
 
 
-def achar(nome):
-    for pasta in (BASE, BASE / "models", BASE / "data"):
-        if (pasta / nome).exists():
-            return pasta / nome
-    st.error(f"Arquivo não encontrado: {nome}")
+def listar_arquivos():
+    """Percorre o repositório ignorando pastas ocultas e ambientes virtuais."""
+    for raiz, pastas, arquivos in os.walk(BASE):
+        pastas[:] = [d for d in pastas if not d.startswith(".")
+                     and d not in ("__pycache__", "venv", "site-packages", "node_modules")]
+        for nome in arquivos:
+            yield Path(raiz) / nome
+
+
+def achar(*nomes):
+    """Procura o arquivo em qualquer pasta do projeto, sem diferenciar maiúsculas/minúsculas.
+    Aceita mais de um nome, em ordem de preferência."""
+    alvos = [n.lower() for n in nomes]
+    todos = list(listar_arquivos())
+    achados = [p for p in todos if p.name.lower() in alvos]
+    if achados:
+        achados.sort(key=lambda p: (alvos.index(p.name.lower()), len(p.parts)))
+        return achados[0]
+    st.error(f"Não encontrei o arquivo `{nomes[0]}`. Estes são os arquivos que o app enxerga:")
+    st.code("\n".join(sorted(str(p.relative_to(BASE)) for p in todos)[:80]))
     st.stop()
 
 
+CAMINHO_MODELO = achar("modelo_evasao_pipeline.joblib", "modelo_evasao_final.joblib")
+CAMINHO_TREINO = achar("dados_treino.csv")
+CAMINHO_TESTE = achar("dados_teste.csv")
+
+
 @st.cache_resource
-def carregar_modelo():
-    obj = joblib.load(achar("modelo_evasao_pipeline.joblib"))
+def carregar_modelo(caminho):
+    obj = joblib.load(caminho)
     if isinstance(obj, dict):
         return obj["model_pipeline"], list(obj["input_features"])
     return obj, list(obj.feature_names_in_)
 
 
 @st.cache_data
-def carregar_dados():
-    return (pd.read_csv(achar("dados_treino.csv")),
-            pd.read_csv(achar("dados_teste.csv")))
+def carregar_dados(caminho_treino, caminho_teste):
+    return pd.read_csv(caminho_treino), pd.read_csv(caminho_teste)
 
 
 def fmt_nota(v):
@@ -100,8 +120,8 @@ def valor_exemplo(col, v):
     return float(v)
 
 
-modelo, colunas = carregar_modelo()
-treino, teste = carregar_dados()
+modelo, colunas = carregar_modelo(str(CAMINHO_MODELO))
+treino, teste = carregar_dados(str(CAMINHO_TREINO), str(CAMINHO_TESTE))
 
 # Estado inicial dos widgets (valores típicos da base de treino)
 for c in colunas:
