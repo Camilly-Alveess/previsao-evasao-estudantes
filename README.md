@@ -1,6 +1,7 @@
 # Previsão de Evasão de Estudantes
 
 Pipeline de Machine Learning para prever a **evasão de estudantes** de uma faculdade a partir de dados de desempenho acadêmico, com deploy em Streamlit.
+
 ---
 
 ## 1. Objetivo
@@ -13,8 +14,9 @@ Construir um modelo de classificação binária que estime a probabilidade de um
 
 ```
 ├── app.py                      # aplicação Streamlit
+├── retreinar_modelo.py         # regenera o modelo com a versão atual do scikit-learn
 ├── outlier_clipper.py          # transformador personalizado usado no pipeline
-├── requirements.txt            # dependências (scikit-learn fixado em 1.6.1)
+├── requirements.txt            # dependências (scikit-learn fixado em 1.8.0)
 ├── Modelo_Evasao.ipynb         # EDA, pré-processamento, treino e avaliação
 ├── data/
 │   ├── dados_treino.csv        # 2.782 alunos (80%)
@@ -122,7 +124,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-> O `scikit-learn` está fixado em **1.6.1**, a mesma versão usada para salvar o modelo. Versões diferentes podem impedir o carregamento do arquivo `.joblib`.
+> O `scikit-learn` está fixado em **1.8.0**, a mesma versão usada para salvar o modelo (o script `retreinar_modelo.py` regenera o modelo). Versões diferentes podem impedir o carregamento do arquivo `.joblib`.
 
 ## 8. Limitações e próximos passos
 
